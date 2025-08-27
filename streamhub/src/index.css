@@ -1,0 +1,20 @@
+:root {
+  --app-max: 1100px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.container {
+  max-width: var(--app-max);
+  margin: 0 auto;
+  padding: 16px;
+}

@@ -1,82 +1,67 @@
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { Stack, Textarea, TextInput, Button, Group, Title } from '@mantine/core'
+import { useState } from 'react'
+import { Button, Group, Stack, Textarea, TextInput, Title } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
-import { listPlans, createPlan } from '@/features/plans/services/plansService'
+import { useSelector } from 'react-redux'
 import type { RootState } from '@/store'
-import type { Plan } from '@/types'
+import { notifications } from '@mantine/notifications'
+import { addPlan } from '@/features/plans/services/plansService'
+import PlansList from '@/features/plans/components/PlansList'
+
+const toISO = (v: string | null): string | null => {
+  if (!v) return null
+  const d = new Date(v)
+  return isNaN(d.getTime()) ? v : d.toISOString()
+}
 
 export default function PlansPage() {
-    const isAdmin = useSelector((s: RootState) => s.auth.isAdmin)
+  const isAdmin = useSelector((s: RootState) => s.auth.isAdmin)
 
-    const [plans, setPlans] = useState<Plan[]>([])
-    const [title, setTitle] = useState('')
-    const [body, setBody] = useState('')
-    // ключевая правка: string | null, не Date
-    const [date, setDate] = useState<string | null>(null)
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [date, setDate] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-    const load = async () => setPlans(await listPlans())
-
-    useEffect(() => {
-        load()
-    }, [])
-
-    const add = async (e: React.FormEvent) => {
-        e.preventDefault()
-        await createPlan({
-            title,
-            body,
-            scheduled_at: date ?? undefined, // ISO-строка или undefined
-        })
-        setTitle('')
-        setBody('')
-        setDate(null)
-        load()
+  const add = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!title.trim()) return
+    setSubmitting(true)
+    try {
+      await addPlan({
+        title: title.trim(),
+        body: body.trim() || null,
+        scheduled_at: toISO(date),
+      })
+      setTitle('')
+      setBody('')
+      setDate(null)
+      setRefreshKey(k => k + 1)
+      notifications.show({ color: 'green', message: 'План добавлен' })
+    } catch (err: any) {
+      notifications.show({ color: 'red', message: err.message || 'Не удалось добавить' })
+    } finally {
+      setSubmitting(false)
     }
+  }
 
-    return (
-        <section>
-            <Title order={2} mb="md">Планы и расписание</Title>
+  return (
+    <section>
+      <Title order={2} mb="md">Планы</Title>
 
-            {isAdmin && (
-                <form onSubmit={add}>
-                    <Stack mb="md">
-                        <TextInput
-                            value={title}
-                            onChange={(e) => setTitle(e.currentTarget.value)}
-                            placeholder="Заголовок"
-                            required
-                        />
+      {isAdmin && (
+        <form onSubmit={add}>
+          <Stack mb="lg">
+            <TextInput label="Заголовок" value={title} onChange={(e) => setTitle(e.currentTarget.value)} required />
+            <Group align="flex-end">
+              <DateTimePicker label="Дата и время" value={date} onChange={setDate} placeholder="Не задано" clearable />
+              <Button type="submit" loading={submitting}>Добавить</Button>
+            </Group>
+            <Textarea label="Описание" autosize minRows={2} value={body} onChange={(e) => setBody(e.currentTarget.value)} />
+          </Stack>
+        </form>
+      )}
 
-                        <Group align="flex-end">
-                            <DateTimePicker
-                                value={date}               // string | null
-                                onChange={setDate}         // (value: string | null) => void
-                                placeholder="Дата и время"
-                            />
-                            <Button type="submit">Добавить</Button>
-                        </Group>
-
-                        <Textarea
-                            value={body}
-                            onChange={(e) => setBody(e.currentTarget.value)}
-                            placeholder="Описание"
-                            autosize
-                            minRows={2}
-                        />
-                    </Stack>
-                </form>
-            )}
-
-            <Stack>
-                {plans.map((p) => (
-                    <div key={p.id}>
-                        <strong>{p.title}</strong>{' '}
-                        — {p.scheduled_at ? new Date(p.scheduled_at).toLocaleString() : 'дата не указана'}
-                        {p.body && <p>{p.body}</p>}
-                    </div>
-                ))}
-            </Stack>
-        </section>
-    )
+      <PlansList key={refreshKey} />
+    </section>
+  )
 }

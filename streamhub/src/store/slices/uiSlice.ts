@@ -1,4 +1,6 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 interface State { search: string }
 const slice = createSlice({
     name: 'ui', initialState: { search: '' } as State, reducers: {

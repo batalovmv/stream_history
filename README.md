@@ -15,39 +15,44 @@
 
 ---
 
-## 📂 Структура проекта
+## 📂 Структура проекта (ключевые файлы)
+
+```txt
 src/
-AppRouter.tsx # маршрутизация
-index.tsx # входная точка
-theme.ts # тема Mantine
+  AppRouter.tsx              # маршрутизация
+  index.tsx                  # входная точка
+  theme.ts                   # тема Mantine
+  index.css                  # глобальные стили
 
-store/ # Redux
-index.ts
-authSlice.ts # состояние пользователя
+  store/                     # Redux
+    index.ts
+    slices/
+      authSlice.ts           # состояние пользователя
 
-features/
-auth/
-AuthButton.tsx # кнопка входа/аватарка
-useAuthSession.ts # синхронизация сессии с Supabase
-plans/
-components/
-PlansList.tsx # список планов (редактировать / удалять)
-services/
-plansService.ts # работа с таблицей plans
+  lib/
+    supabaseClient.ts        # инициализация клиента Supabase
 
-pages/
-HomePage.tsx # главная
-PlansPage.tsx # планы стримов (добавление/редактирование)
-ArchivePage.tsx # архив (пока заглушка)
+  features/
+    auth/
+      AuthButton.tsx         # кнопка входа/аватарка
+      useAuthSession.ts      # синхронизация сессии с Supabase
+    plans/
+      components/
+        PlansList.tsx        # список планов (редактировать / удалять)
+      services/
+        plansService.ts      # работа с таблицей plans
 
-components/
-layout/
-Header.tsx # шапка с навигацией
-ui/
-Container.tsx # обёртка Container (Mantine)
+  pages/
+    HomePage.tsx             # главная
+    PlansPage.tsx            # планы стримов (добавление/редактирование)
+    ArchivePage.tsx          # архив (пока заглушка)
 
-pgsql
-Копировать код
+  components/
+    layout/
+      Header.tsx             # шапка с навигацией
+    ui/
+      Container.tsx          # обёртка над Mantine Container
+
 
 ---
 

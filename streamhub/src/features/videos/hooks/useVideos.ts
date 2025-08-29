@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { listLatestVideos } from '../services/videosService'
 import type { Video } from '@/types'
+import { listLatestVideos } from '../services/videosService'
 
 
 export function useLatestVideos(limit = 20) {

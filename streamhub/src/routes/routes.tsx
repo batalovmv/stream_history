@@ -4,6 +4,10 @@ import FeedPage from '../pages/FeedPage'
 import ArchivePage from '../pages/ArchivePage'
 import PlansPage from '../pages/PlansPage'
 
+import NewVideoPage from '@/pages/admin/NewVideoPage'
+import YoutubeImportPage from '@/pages/admin/YoutubeImportPage'
+
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -12,6 +16,10 @@ export const router = createBrowserRouter([
       { index: true, element: <FeedPage /> },
       { path: 'archive', element: <ArchivePage /> },
       { path: 'plans', element: <PlansPage /> },
+
+      // Админ
+      { path: 'admin/videos/new', element: <NewVideoPage /> },
+      { path: 'admin/youtube-import', element: <YoutubeImportPage /> },
     ],
   },
 ])

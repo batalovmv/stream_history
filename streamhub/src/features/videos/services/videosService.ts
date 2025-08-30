@@ -1,3 +1,4 @@
+import { getGameBySlug } from '@/features/games/services/gamesService'
 import { supabase } from '@/lib/supabaseClient'
 import type { Video } from '@/types'
 import { slugify } from '@/utils/slug'
@@ -163,3 +164,16 @@ export async function removeVideo(id: number): Promise<void> {
     if (error) throw error
 }
 
+export async function listVideosByGameSlug(slug: string): Promise<{ game: { id: number; name: string; slug: string } | null; videos: Video[] }> {
+    const game = await getGameBySlug(slug)
+    if (!game) return { game: null, videos: [] }
+
+    const { data, error } = await supabase
+        .from('videos')
+        .select('id, title, youtube_url, description, published_at, created_at, author_id, tags, game_id, games:game_id(name, slug)')
+        .eq('game_id', game.id)
+        .order('published_at', { ascending: false })
+    if (error) throw error
+
+    return { game, videos: (data as unknown as Video[]) ?? [] }
+}

@@ -13,7 +13,18 @@ export async function listComments(videoId: number): Promise<Comment[]> {
 }
 
 
-export async function addComment({ videoId, userId, body }: { videoId: number; userId: string; body: string }): Promise<void> {
-    const { error } = await supabase.from('comments').insert({ video_id: videoId, user_id: userId, body })
+export async function addComment({ videoId, body }: { videoId: number; body: string }): Promise<void> {
+    const { error } = await supabase.from('comments').insert({ video_id: videoId, body })
+    if (error) throw error
+}
+
+export async function addReply({ videoId, parentId, body }:
+    { videoId: number; parentId: number; body: string }) {
+    const { error } = await supabase.from('comments').insert({ video_id: videoId, parent_id: parentId, body })
+    if (error) throw error
+}
+
+export async function removeComment(id: number) {
+    const { error } = await supabase.from('comments').delete().eq('id', id)
     if (error) throw error
 }

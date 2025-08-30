@@ -7,3 +7,12 @@ export interface Video {
 }
 export interface Comment { id: number; video_id: number; user_id: UUID; body: string; created_at: string; profiles?: { display_name?: string | null; avatar_url?: string | null } }
 export interface Plan { id: number; title: string; body?: string | null; scheduled_at?: string | null; created_at: string; author_id: UUID }
+export interface Comment {
+    id: number;
+    video_id: number;
+    user_id: string;
+    body: string;
+    created_at: string;
+    parent_id?: number | null;
+    profiles?: { display_name?: string | null; avatar_url?: string | null };
+}

@@ -12,9 +12,12 @@ export default function AuthButton() {
     }, [user])
 
     const signIn = async () => {
+        const base = import.meta.env.BASE_URL.replace(/\/$/, '') // '/stream_history' или ''
+        const redirectTo = `${window.location.origin}${base}/`   // 'https://batalovmv.github.io/stream_history/'
+
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
-            options: { redirectTo: window.location.origin },
+            options: { redirectTo },
         })
         if (error) console.error('OAuth error:', error)
     }

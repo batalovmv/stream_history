@@ -21,21 +21,26 @@ function RouteError() {
   )
 }
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <MainLayout />,
+      errorElement: <RouteError />,
+      children: [
+        { index: true, element: <FeedPage /> },
+        { path: 'archive', element: <ArchivePage /> },
+        { path: 'plans', element: <PlansPage /> },
+        { path: 'video/:id', element: <VideoPage /> },
+        { path: 'video/:id/edit', element: <VideoEditPage /> },
+        { path: 'game/:slug', element: <GamePage /> },
+        // Админ
+        { path: 'admin/videos/new', element: <NewVideoPage /> },
+        { path: 'admin/youtube-import', element: <YoutubeImportPage /> },
+      ],
+    },
+  ],
   {
-    path: '/',
-    element: <MainLayout />,
-    errorElement: <RouteError />,
-    children: [
-      { index: true, element: <FeedPage /> },
-      { path: 'archive', element: <ArchivePage /> },
-      { path: 'plans', element: <PlansPage /> },
-      { path: 'video/:id', element: <VideoPage /> },
-      { path: 'video/:id/edit', element: <VideoEditPage /> },
-      { path: 'game/:slug', element: <GamePage /> },
-      // Админ
-      { path: 'admin/videos/new', element: <NewVideoPage /> },
-      { path: 'admin/youtube-import', element: <YoutubeImportPage /> },
-    ],
-  },
-])
+    basename: import.meta.env.BASE_URL, 
+  }
+)

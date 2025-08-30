@@ -2,8 +2,9 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Title } from '@mantine/core'
 import VideoGrid from '@/features/videos/components/VideoGrid'
-import { listVideosByGameSlug } from '@/features/videos/services/videosService'
+
 import type { Video } from '@/types'
+import { listVideosByGameSlug } from '@/features/videos/services/videosService'
 
 
 export default function GamePage() {
@@ -31,3 +32,4 @@ export default function GamePage() {
         </div>
     )
 }
+

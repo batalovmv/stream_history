@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ]         
   workflow_dispatch:
 
 permissions:
@@ -13,6 +13,11 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: true
+
+# все команды по умолчанию выполняем в подпапке streamhub
+defaults:
+  run:
+    working-directory: streamhub
 
 jobs:
   build:
@@ -26,6 +31,8 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          # важное: путь к lock-файлу внутри подпапки
+          cache-dependency-path: streamhub/package-lock.json
 
       - name: Create .env for Vite
         run: |
@@ -46,7 +53,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          # отдаем сборку из подпапки
+          path: streamhub/dist
 
   deploy:
     needs: build
@@ -55,6 +63,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v4

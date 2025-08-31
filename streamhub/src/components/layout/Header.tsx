@@ -6,7 +6,8 @@ import type { RootState } from '@/store'
 
 export default function Header() {
   const isAdmin = useSelector((s: RootState) => s.auth.isAdmin)
-
+  const myHandle = useSelector((s: RootState) => s.auth.profile?.handle)
+  const user = useSelector((s: RootState) => s.auth.user)
   return (
     <Group justify="space-between" py="md">
       <Title order={3}>
@@ -16,17 +17,28 @@ export default function Header() {
       </Title>
 
       <Group gap="md">
-        <Anchor component={Link} to="/archive">Архив</Anchor>
-        <Anchor component={Link} to="/plans">Планы</Anchor>
+        {myHandle && (
+          <Anchor component={Link} to={`/${myHandle}`}>Моя страница</Anchor>
+        )}
 
+        {/* доступно ЛЮБОМУ залогиненному */}
+        {user && (
+          <>
+            <Button component={Link} to="/admin/videos/new" variant="light">
+              Добавить видео
+            </Button>
+            <Button component={Link} to="/admin/youtube-import" variant="light">
+              Импорт с YouTube
+            </Button>
+          </>
+        )}
+
+        {/* только администратору — оставляем админ-меню для других вещей */}
         {isAdmin && (
-          <Menu withinPortal>
-            <Menu.Target>
-              <Button variant="light">Админ</Button>
-            </Menu.Target>
+          <Menu>
+            <Menu.Target><Button variant="default">Админ</Button></Menu.Target>
             <Menu.Dropdown>
-              <Menu.Item component={Link} to="/admin/videos/new">Добавить видео</Menu.Item>
-              <Menu.Item component={Link} to="/admin/youtube-import">Импорт с YouTube</Menu.Item>
+              {/* тут оставь сугубо админские пункты, если есть */}
             </Menu.Dropdown>
           </Menu>
         )}

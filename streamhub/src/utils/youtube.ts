@@ -23,3 +23,4 @@ export function youtubeThumb(url: string): { primary: string; fallback: string }
         fallback: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
     }
 }
+

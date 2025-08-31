@@ -1,13 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
+export interface Profile {
+  handle?: string | null
+  display_name?: string | null
+  avatar_url?: string | null
+}
+
 interface AuthState {
   user: any | null
   isAdmin: boolean
-  ready: boolean          // ← флаг готовности (первая синхронизация завершена)
+  profile: Profile | null
+  ready: boolean
 }
 
-const initialState: AuthState = { user: null, isAdmin: false, ready: false }
+const initialState: AuthState = { user: null, isAdmin: false, profile: null, ready: false }
 
 const slice = createSlice({
   name: 'auth',
@@ -15,10 +22,11 @@ const slice = createSlice({
   reducers: {
     setUser: (s, a: PayloadAction<any | null>) => { s.user = a.payload },
     setIsAdmin: (s, a: PayloadAction<boolean>) => { s.isAdmin = a.payload },
-    clearUser: (s) => { s.user = null; s.isAdmin = false },
-    setReady: (s, a: PayloadAction<boolean>) => { s.ready = a.payload }, // ← добавили
+    setProfile: (s, a: PayloadAction<Profile | null>) => { s.profile = a.payload },
+    clearUser: (s) => { s.user = null; s.isAdmin = false; s.profile = null },
+    setReady: (s, a: PayloadAction<boolean>) => { s.ready = a.payload },
   },
 })
 
-export const { setUser, setIsAdmin, clearUser, setReady } = slice.actions
+export const { setUser, setIsAdmin, setProfile, clearUser, setReady } = slice.actions
 export default slice.reducer

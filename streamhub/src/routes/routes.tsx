@@ -9,6 +9,10 @@ import VideoEditPage from '@/pages/VideoEditPage'
 import GamePage from '@/pages/GamePage'
 import NewVideoPage from '@/pages/admin/NewVideoPage'
 import YoutubeImportPage from '@/pages/admin/YoutubeImportPage'
+import UserPage from '@/pages/UserPage'
+import ProfileSettingsPage from '@/pages/ProfileSettingsPage'
+import PrivacyPage from '@/pages/PrivacyPage'
+import TermsPage from '@/pages/TermsPage'
 
 function RouteError() {
   return (
@@ -34,6 +38,11 @@ export const router = createBrowserRouter(
         { path: 'video/:id', element: <VideoPage /> },
         { path: 'video/:id/edit', element: <VideoEditPage /> },
         { path: 'game/:slug', element: <GamePage /> },
+        { path: 'u/:handle', element: <UserPage /> },
+        { path: 'settings/profile', element: <ProfileSettingsPage /> },
+        { path: ':handle([a-z0-9._-]+)', element: <UserPage /> },
+        { path: 'privacy', element: <PrivacyPage /> },
+        { path: 'terms', element: <TermsPage /> },
         // Админ
         { path: 'admin/videos/new', element: <NewVideoPage /> },
         { path: 'admin/youtube-import', element: <YoutubeImportPage /> },
@@ -41,6 +50,6 @@ export const router = createBrowserRouter(
     },
   ],
   {
-    basename: import.meta.env.BASE_URL, 
+    basename: import.meta.env.BASE_URL,
   }
 )

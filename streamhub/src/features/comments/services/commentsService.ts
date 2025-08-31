@@ -28,3 +28,12 @@ export async function removeComment(id: number) {
     const { error } = await supabase.from('comments').delete().eq('id', id)
     if (error) throw error
 }
+
+export async function getCommentCount(videoId: number) {
+    const { count, error } = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('video_id', videoId)
+    if (error) throw error
+    return count ?? 0
+}

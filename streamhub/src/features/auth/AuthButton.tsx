@@ -12,14 +12,25 @@ export default function AuthButton() {
     }, [user])
 
     const signIn = async () => {
-        const base = import.meta.env.BASE_URL.replace(/\/$/, '') // '/stream_history' или ''
-        const redirectTo = `${window.location.origin}${base}/`   // 'https://batalovmv.github.io/stream_history/'
+        const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+        const redirectTo = `${window.location.origin}${base}/`
+
+        // ОБЯЗАТЕЛЬНО добавь youtube.readonly
+        const scopes = 'openid email profile https://www.googleapis.com/auth/youtube.readonly'
 
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
-            options: { redirectTo },
+            options: {
+                redirectTo,
+                scopes,
+                // форсируем повторное согласие, чтобы выдали новый токен со скоупом
+                queryParams: {
+                    prompt: 'consent',
+                    access_type: 'offline',
+                },
+            },
         })
-        if (error) console.error('OAuth error:', error)
+        if (error) console.error(error)
     }
 
     const signOut = async () => {

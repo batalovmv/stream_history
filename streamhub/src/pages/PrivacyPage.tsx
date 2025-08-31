@@ -32,7 +32,7 @@ export default function PrivacyPage() {
             <List mt="xs">
                 <List.Item>You can delete imported videos in the app.</List.Item>
                 <List.Item>
-                    To request full data deletion, contact us at <Anchor href="mailto:you@example.com">you@example.com</Anchor>.
+                    To request full data deletion, contact us at <Anchor href="mailto:batalov94@gmail.com">batalov94@gmail.com</Anchor>.
                 </List.Item>
                 <List.Item>
                     You can revoke access anytime in Google Account settings:&nbsp;
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
             <Title order={4}>Contact</Title>
             <Text>
                 If you have questions about this policy, email us at&nbsp;
-                <Anchor href="mailto:you@example.com">you@example.com</Anchor>.
+                <Anchor href="mailto:batalov94@gmail.com">batalov94@gmail.com</Anchor>.
             </Text>
         </Container>
     )

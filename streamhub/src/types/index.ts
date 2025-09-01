@@ -16,3 +16,18 @@ export interface Comment {
     parent_id?: number | null;
     profiles?: { display_name?: string | null; avatar_url?: string | null };
 }
+export type NotificationType = 'LIKE_VIDEO' | 'COMMENT_VIDEO' | 'REPLY_COMMENT'
+
+export interface Notification {
+    id: number
+    recipient_id: string
+    actor_id: string
+    type: NotificationType
+    video_id?: number | null
+    comment_id?: number | null
+    created_at: string
+    read_at?: string | null
+    // обогащение из join (UI удобно показывает имя актёра, назв. видео)
+    actor?: { display_name?: string | null; handle?: string | null; avatar_url?: string | null }
+    video?: { title?: string | null }
+}

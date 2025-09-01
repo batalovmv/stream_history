@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import AuthButton from '@/features/auth/AuthButton'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store'
+import NotificationsBell from '@/features/notifications/components/NotificationsBell'
 
 export default function Header() {
   const isAdmin = useSelector((s: RootState) => s.auth.isAdmin)
@@ -43,6 +44,7 @@ export default function Header() {
           </Menu>
         )}
 
+        <NotificationsBell />
         <AuthButton />
       </Group>
     </Group>

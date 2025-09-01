@@ -1,33 +1,25 @@
-import { useEffect, useState } from 'react'
-import { Alert, Skeleton, Stack } from '@mantine/core'
-import VideoGrid from '@/features/videos/components/VideoGrid'
-import { useLatestVideos } from '@/features/videos/hooks/useVideos'
-import AuthDebug from '@/features/auth/AuthDebug'
-import type { Video } from '@/types'
+import { useSelector } from 'react-redux'
+import type { RootState } from '@/store'
+import { Link } from 'react-router-dom'
+import { Button, Group, Paper, Stack, Text, Title } from '@mantine/core'
 
 export default function FeedPage() {
-  const { data, loading, error } = useLatestVideos(20)
-  const [items, setItems] = useState<Video[]>([])
+  const handle = useSelector((s: RootState) => s.auth.profile?.handle)
+  const user = useSelector((s: RootState) => s.auth.user)
 
-  useEffect(() => { if (data) setItems(data) }, [data])
-
-  if (loading) {
-    return (
+  return (
+    <Paper p="lg" radius="md" withBorder>
       <Stack>
-        <AuthDebug />
-        <Skeleton h={16} w={200} />
-        <Skeleton h={200} />
-        <Skeleton h={200} />
+        <Title order={2}>StreamHub</Title>
+        <Text c="dimmed">Ваши ролики — в одном месте. Импортируйте видео с YouTube и ведите собственную ленту.</Text>
+        <Group>
+          {user && handle ? (
+            <Button component={Link} to={`/u/${handle}`} variant="filled">Мои видео</Button>
+          ) : (
+            <Text c="dimmed">Войдите, чтобы перейти к своим видео.</Text>
+          )}
+        </Group>
       </Stack>
-    )
-  }
-  if (error) return <Alert color="red">Ошибка: {(error as Error).message}</Alert>
-
-  const onChanged = (v: Video) =>
-    setItems(prev => prev.map(x => x.id === v.id ? v : x))
-
-  const onDeleted = (id: number) =>
-    setItems(prev => prev.filter(x => x.id !== id))
-
-  return <VideoGrid videos={items} onChanged={onChanged} onDeleted={onDeleted} />
+    </Paper>
+  )
 }

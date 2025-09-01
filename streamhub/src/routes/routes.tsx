@@ -46,6 +46,7 @@ export const router = createBrowserRouter(
         // Админ
         { path: 'admin/videos/new', element: <NewVideoPage /> },
         { path: 'admin/youtube-import', element: <YoutubeImportPage /> },
+        
       ],
     },
   ],

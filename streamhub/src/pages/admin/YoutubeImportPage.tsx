@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { Button, Group, Text, TextInput, Alert, Stack, Card as MCard } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { supabase } from '@/lib/supabaseClient'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import type { RootState } from '@/store'
 
 type MyVideo = {
     id: string
@@ -13,19 +16,82 @@ type MyVideo = {
 export default function YoutubeImportPage() {
     const [input, setInput] = useState('')               // ссылка/ID видео
     const [owned, setOwned] = useState<string[]>([])     // подтверждённые channel_id
+    const userId = useSelector((s: RootState) => s.auth.user?.id)
     const [loading, setLoading] = useState(false)
     const [loadingList, setLoadingList] = useState(false)
     const [myVideos, setMyVideos] = useState<MyVideo[]>([])
-
+    const user = useSelector((s: RootState) => s.auth.user)
+    const navigate = useNavigate()
     // загрузить список подтверждённых каналов
     useEffect(() => {
-        (async () => {
-            const { data, error } = await supabase.from('user_channels').select('channel_id')
-            if (!error) setOwned((data as { channel_id: string }[] ?? []).map(r => r.channel_id))
-        })()
-    }, [])
+        let cancelled = false
+            ; (async () => {
+                if (!userId) return
+                const { data, error } = await supabase
+                    .from('user_channels')
+                    .select('channel_id')
+                    .eq('user_id', userId)
+                if (!error && !cancelled) {
+                    setOwned((data ?? []).map((r: any) => r.channel_id))
+                }
+            })()
+        return () => { cancelled = true }
+    }, [userId])
+
+
 
     // ---- Утилиты ----
+    const linkAccount = async () => {
+        try {
+            if (!userId) throw new Error('Требуется вход')
+            setLoading(true)
+            const token = await getProviderToken()
+            if (!token) throw new Error('Нет токена доступа YouTube')
+
+            // Берём список каналов текущего пользователя
+            const chRes = await fetch(
+                'https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&mine=true',
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+            if (!chRes.ok) throw new Error('Не удалось получить каналы YouTube')
+            const chJson = await chRes.json()
+            const channels = (chJson.items ?? []).map((c: any) => ({
+                channel_id: c.id as string,
+                title: c?.snippet?.title as string,
+            }))
+
+            if (channels.length === 0) {
+                notifications.show({ color: 'yellow', message: 'У аккаунта не найдено каналов' })
+                return
+            }
+
+            // Сохраняем/обновляем привязку в БД
+            const upserts = channels.map((c: { channel_id: string; title: string }) => ({
+                user_id: userId,
+                channel_id: c.channel_id,
+                title: c.title,
+            }))
+
+            const { error: upErr } = await supabase
+                .from('user_channels')
+                .upsert(upserts, { onConflict: 'user_id,channel_id' })
+            if (upErr) throw upErr
+
+            // Обновляем локальное состояние из БД (источник истины)
+            const { data: fresh } = await supabase
+                .from('user_channels')
+                .select('channel_id')
+                .eq('user_id', userId)
+            setOwned((fresh ?? []).map((r: any) => r.channel_id))
+
+            notifications.show({ color: 'green', message: 'Канал(ы) привязаны' })
+        } catch (e: any) {
+            notifications.show({ color: 'red', message: e.message || 'Не удалось привязать канал' })
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const extractVideoId = (s: string): string | null => {
         const isId = /^[a-zA-Z0-9_-]{11}$/
         try {
@@ -72,9 +138,11 @@ export default function YoutubeImportPage() {
             .from('user_channels')
             .select('*', { head: true, count: 'exact' })
             .eq('channel_id', channelId)
+            .eq('user_id', userId)     // <— добавили проверку по пользователю
         if (error) throw error
-        if (!count) throw new Error('Можно импортировать только видео со своих каналов')
+        if (!count) throw new Error('Сначала привяжите канал на YouTube (вверху страницы).')
     }
+
 
     // ---- Действия ----
     const confirmMyChannel = async () => {
@@ -176,7 +244,7 @@ export default function YoutubeImportPage() {
             const description = meta.snippet.description
             const youtube_url = `https://www.youtube.com/watch?v=${videoId}`
             const { error } = await supabase.from('videos').insert({
-                title, description, youtube_url,
+                title, description, youtube_url, author_id: userId,
                 // если добавил videos.channel_id в БД — раскомментируй:
                 // channel_id: channelId,
             })

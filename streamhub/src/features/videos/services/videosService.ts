@@ -8,6 +8,17 @@ type FetchParams = {
     limit?: number
 }
 
+export async function listVideosByAuthorId(authorId: string): Promise<Video[]> {
+    const { data, error } = await supabase
+        .from('videos')
+        .select('id, title, youtube_url, description, published_at, created_at, author_id, tags, game_id, games:game_id(name, slug)')
+        .eq('author_id', authorId)
+        .order('published_at', { ascending: false })
+
+    if (error) throw error
+    return (data as unknown as Video[]) ?? []
+}
+
 /** Базовая выборка видео c опциональным фильтром по game_slug */
 export async function fetchVideos(params?: FetchParams): Promise<Video[]> {
     let q = supabase

@@ -8,6 +8,7 @@ export default function Header() {
   const isAdmin = useSelector((s: RootState) => s.auth.isAdmin)
   const myHandle = useSelector((s: RootState) => s.auth.profile?.handle)
   const user = useSelector((s: RootState) => s.auth.user)
+
   return (
     <Group justify="space-between" py="md">
       <Title order={3}>
@@ -16,30 +17,29 @@ export default function Header() {
         </Anchor>
       </Title>
 
-      <Group gap="md">
+      <Group gap="sm">
         {myHandle && (
-          <Anchor component={Link} to={`/${myHandle}`}>Моя страница</Anchor>
+          <Anchor component={Link} to={`/u/${myHandle}`}>Моя страница</Anchor>
         )}
 
-        {/* доступно ЛЮБОМУ залогиненному */}
+        {/* Импорт с YouTube — для всех авторизованных */}
         {user && (
-          <>
-            <Button component={Link} to="/admin/videos/new" variant="light">
-              Добавить видео
-            </Button>
-            <Button component={Link} to="/admin/youtube-import" variant="light">
-              Импорт с YouTube
-            </Button>
-          </>
+          <Button component={Link} to="/admin/youtube-import" variant="default">
+            Импорт с YouTube
+          </Button>
         )}
 
-        {/* только администратору — оставляем админ-меню для других вещей */}
+        {/* Добавить видео — только для админа */}
+        {isAdmin && (
+          <Button component={Link} to="/admin/videos/new" variant="filled">
+            Добавить видео
+          </Button>
+        )}
+
         {isAdmin && (
           <Menu>
             <Menu.Target><Button variant="default">Админ</Button></Menu.Target>
-            <Menu.Dropdown>
-              {/* тут оставь сугубо админские пункты, если есть */}
-            </Menu.Dropdown>
+            <Menu.Dropdown>{/* прочие админские пункты при желании */}</Menu.Dropdown>
           </Menu>
         )}
 
